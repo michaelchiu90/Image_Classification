@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html data-markdown-preview-plus-context="html-export">
+  <head>
+    <meta charset="utf-8" />
+    <title>ImageClassification</title><script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    extensions: ["[a11y]/accessibility-menu.js"],
+    'HTML-CSS': {
+      availableFonts: [],
+      webFont: 'TeX',
+      undefinedFamily: "serif",
+      mtextFontInherit: true,
+    },
+    TeX: {
+  "Macros": {},
+  "equationNumbers": {
+    "autoNumber": "AMS",
+    "useLabelIds": false
+  },
+  "extensions": [
+    "AMSmath.js",
+    "AMSsymbols.js",
+    "noErrors.js",
+    "noUndefined.js",
+    "AMSmath.js"
+  ]
+},
+    showMathMenu: true
+  });
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js"></script>
+    <style>.emoji {
+  max-width: 1em !important;
+}
+del {
+  text-decoration: none;
+  position: relative;
+}
+del::after {
+  border-bottom: 1px solid black;
+  content: '';
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 50%;
+}
+ul.contains-task-list li.task-list-item {
+  position: relative;
+  list-style-type: none;
+}
+ul.contains-task-list li.task-list-item input.task-list-item-checkbox {
+  position: absolute;
+  transform: translateX(-100%);
+  width: 30px;
+}
+span.critic.comment {
+  position: relative;
+}
+span.critic.comment::before {
+  content: '\1f4ac';
+  position: initial;
+}
+span.critic.comment > span {
+  display: none;
+}
+span.critic.comment:hover > span {
+  display: initial;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  border: 1px solid;
+  border-radius: 5px;
+  max-height: 4em;
+  overflow: auto;
+}
+span.critic.comment:focus > span {
+  display: initial;
+  text-decoration: underline;
+  position: initial;
+  top: auto;
+  left: auto;
+  border: initial;
+  border-radius: initial;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  background-color: transparent;
+}
+
+body {
+  overflow: initial !important;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+  line-height: 1.6;
+  word-wrap: break-word;
+  padding: 30px;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+}
+body > *:first-child {
+  margin-top: 0 !important;
+}
+body > *:last-child {
+  margin-bottom: 0 !important;
+}
+body a:not([href]) {
+  color: inherit;
+  text-decoration: none;
+}
+body .absent {
+  color: #c00;
+}
+body .anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  padding-right: 6px;
+  padding-left: 30px;
+  margin-left: -30px;
+}
+body .anchor:focus {
+  outline: none;
+}
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6 {
+  position: relative;
+  margin-top: 1em;
+  margin-bottom: 16px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+body h1 .octicon-link,
+body h2 .octicon-link,
+body h3 .octicon-link,
+body h4 .octicon-link,
+body h5 .octicon-link,
+body h6 .octicon-link {
+  display: none;
+  color: #000;
+  vertical-align: middle;
+}
+body h1:hover .anchor,
+body h2:hover .anchor,
+body h3:hover .anchor,
+body h4:hover .anchor,
+body h5:hover .anchor,
+body h6:hover .anchor {
+  padding-left: 8px;
+  margin-left: -30px;
+  text-decoration: none;
+}
+body h1:hover .anchor .octicon-link,
+body h2:hover .anchor .octicon-link,
+body h3:hover .anchor .octicon-link,
+body h4:hover .anchor .octicon-link,
+body h5:hover .anchor .octicon-link,
+body h6:hover .anchor .octicon-link {
+  display: inline-block;
+}
+body h1 tt,
+body h2 tt,
+body h3 tt,
+body h4 tt,
+body h5 tt,
+body h6 tt,
+body h1 code,
+body h2 code,
+body h3 code,
+body h4 code,
+body h5 code,
+body h6 code {
+  font-size: inherit;
+}
+body h1 {
+  padding-bottom: 0.3em;
+  font-size: 2.25em;
+  line-height: 1.2;
+  border-bottom: 1px solid #eee;
+}
+body h1 .anchor {
+  line-height: 1;
+}
+body h2 {
+  padding-bottom: 0.3em;
+  font-size: 1.75em;
+  line-height: 1.225;
+  border-bottom: 1px solid #eee;
+}
+body h2 .anchor {
+  line-height: 1;
+}
+body h3 {
+  font-size: 1.5em;
+  line-height: 1.43;
+}
+body h3 .anchor {
+  line-height: 1.2;
+}
+body h4 {
+  font-size: 1.25em;
+}
+body h4 .anchor {
+  line-height: 1.2;
+}
+body h5 {
+  font-size: 1em;
+}
+body h5 .anchor {
+  line-height: 1.1;
+}
+body h6 {
+  font-size: 1em;
+  color: #777;
+}
+body h6 .anchor {
+  line-height: 1.1;
+}
+body p,
+body blockquote,
+body ul,
+body ol,
+body dl,
+body table,
+body pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+body hr {
+  height: 4px;
+  padding: 0;
+  margin: 16px 0;
+  background-color: #e7e7e7;
+  border: 0 none;
+}
+body ul,
+body ol {
+  padding-left: 2em;
+}
+body ul.no-list,
+body ol.no-list {
+  padding: 0;
+  list-style-type: none;
+}
+body ul ul,
+body ul ol,
+body ol ol,
+body ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+body li > p {
+  margin-top: 16px;
+}
+body dl {
+  padding: 0;
+}
+body dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: bold;
+}
+body dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+body blockquote {
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+body blockquote > :first-child {
+  margin-top: 0;
+}
+body blockquote > :last-child {
+  margin-bottom: 0;
+}
+body table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  word-break: normal;
+  word-break: keep-all;
+}
+body table th {
+  font-weight: bold;
+}
+body table th,
+body table td {
+  padding: 6px 13px;
+  border: 1px solid #ddd;
+}
+body table tr {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+body table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+body img {
+  max-width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+body .emoji {
+  max-width: none;
+}
+body span.frame {
+  display: block;
+  overflow: hidden;
+}
+body span.frame > span {
+  display: block;
+  float: left;
+  width: auto;
+  padding: 7px;
+  margin: 13px 0 0;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+body span.frame span img {
+  display: block;
+  float: left;
+}
+body span.frame span span {
+  display: block;
+  padding: 5px 0 0;
+  clear: both;
+  color: #333;
+}
+body span.align-center {
+  display: block;
+  overflow: hidden;
+  clear: both;
+}
+body span.align-center > span {
+  display: block;
+  margin: 13px auto 0;
+  overflow: hidden;
+  text-align: center;
+}
+body span.align-center span img {
+  margin: 0 auto;
+  text-align: center;
+}
+body span.align-right {
+  display: block;
+  overflow: hidden;
+  clear: both;
+}
+body span.align-right > span {
+  display: block;
+  margin: 13px 0 0;
+  overflow: hidden;
+  text-align: right;
+}
+body span.align-right span img {
+  margin: 0;
+  text-align: right;
+}
+body span.float-left {
+  display: block;
+  float: left;
+  margin-right: 13px;
+  overflow: hidden;
+}
+body span.float-left span {
+  margin: 13px 0 0;
+}
+body span.float-right {
+  display: block;
+  float: right;
+  margin-left: 13px;
+  overflow: hidden;
+}
+body span.float-right > span {
+  display: block;
+  margin: 13px auto 0;
+  overflow: hidden;
+  text-align: right;
+}
+body code,
+body tt {
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(0, 0, 0, 0.04);
+  border-radius: 3px;
+}
+body code:before,
+body tt:before,
+body code:after,
+body tt:after {
+  letter-spacing: -0.2em;
+  content: "\00a0";
+}
+body code br,
+body tt br {
+  display: none;
+}
+body del code {
+  text-decoration: inherit;
+}
+body pre > code {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+body .highlight {
+  margin-bottom: 16px;
+}
+body .highlight pre,
+body pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+}
+body .highlight pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+body pre {
+  word-wrap: normal;
+}
+body pre code,
+body pre tt {
+  display: inline;
+  max-width: initial;
+  padding: 0;
+  margin: 0;
+  overflow: initial;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+body pre code:before,
+body pre tt:before,
+body pre code:after,
+body pre tt:after {
+  content: normal;
+}
+body kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font-size: 11px;
+  line-height: 10px;
+  color: #555;
+  vertical-align: middle;
+  background-color: #fcfcfc;
+  border: solid 1px #ccc;
+  border-bottom-color: #bbb;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #bbb;
+}
+span.critic.comment > span {
+  background-color: #fff;
+}
+a {
+  color: #337ab7;
+}
+
+.bracket-matcher .region {
+  border-bottom: 1px dotted lime;
+  position: absolute;
+}
+.line-number.bracket-matcher.bracket-matcher {
+  color: #abb2bf;
+  background-color: #3a3f4b;
+}
+
+.ftpconfig_line_error {
+  background: rgba(255, 0, 0, 0.5) !important;
+}
+.btn.btn-float-left {
+  float: left !important;
+}
+.btn.btn-float-right {
+  float: right !important;
+}
+
+.spell-check-misspelling .region {
+  border-bottom: 2px dotted rgba(255, 51, 51, 0.75);
+}
+.spell-check-corrections {
+  width: 25em !important;
+}
+
+pre.editor-colors {
+  background-color: #282c34;
+  color: #abb2bf;
+}
+pre.editor-colors .line.cursor-line {
+  background-color: rgba(153, 187, 255, 0.04);
+}
+pre.editor-colors .invisible {
+  color: #abb2bf;
+}
+pre.editor-colors .cursor {
+  border-left: 2px solid #528bff;
+}
+pre.editor-colors .selection .region {
+  background-color: #3e4451;
+}
+pre.editor-colors .bracket-matcher .region {
+  border-bottom: 1px solid #528bff;
+  box-sizing: border-box;
+}
+pre.editor-colors .invisible-character {
+  color: rgba(171, 178, 191, 0.15);
+}
+pre.editor-colors .indent-guide {
+  color: rgba(171, 178, 191, 0.15);
+}
+pre.editor-colors .wrap-guide {
+  background-color: rgba(171, 178, 191, 0.15);
+}
+pre.editor-colors .find-result .region.region.region,
+pre.editor-colors .current-result .region.region.region {
+  border-radius: 2px;
+  background-color: rgba(82, 139, 255, 0.24);
+  transition: border-color 0.4s;
+}
+pre.editor-colors .find-result .region.region.region {
+  border: 2px solid transparent;
+}
+pre.editor-colors .current-result .region.region.region {
+  border: 2px solid #528bff;
+  transition-duration: .1s;
+}
+pre.editor-colors .gutter .line-number {
+  color: #636d83;
+  -webkit-font-smoothing: antialiased;
+}
+pre.editor-colors .gutter .line-number.cursor-line {
+  color: #abb2bf;
+  background-color: #3a3f4b;
+}
+pre.editor-colors .gutter .line-number.cursor-line-no-selection {
+  background-color: transparent;
+}
+pre.editor-colors .gutter .line-number .icon-right {
+  color: #abb2bf;
+}
+pre.editor-colors .gutter:not(.git-diff-icon) .line-number.git-line-removed.git-line-removed::before {
+  bottom: -3px;
+}
+pre.editor-colors .gutter:not(.git-diff-icon) .line-number.git-line-removed::after {
+  content: "";
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 25px;
+  border-bottom: 1px dotted rgba(224, 82, 82, 0.5);
+  pointer-events: none;
+}
+pre.editor-colors .gutter .line-number.folded,
+pre.editor-colors .gutter .line-number:after,
+pre.editor-colors .fold-marker:after {
+  color: #abb2bf;
+}
+.syntax--comment {
+  color: #5c6370;
+  font-style: italic;
+}
+.syntax--comment .syntax--markup.syntax--link {
+  color: #5c6370;
+}
+.syntax--entity.syntax--name.syntax--type {
+  color: #e5c07b;
+}
+.syntax--entity.syntax--other.syntax--inherited-class {
+  color: #e5c07b;
+}
+.syntax--keyword {
+  color: #c678dd;
+}
+.syntax--keyword.syntax--control {
+  color: #c678dd;
+}
+.syntax--keyword.syntax--operator {
+  color: #c678dd;
+}
+.syntax--keyword.syntax--other.syntax--special-method {
+  color: #61afef;
+}
+.syntax--keyword.syntax--other.syntax--unit {
+  color: #d19a66;
+}
+.syntax--storage {
+  color: #c678dd;
+}
+.syntax--storage.syntax--type.syntax--annotation,
+.syntax--storage.syntax--type.syntax--primitive {
+  color: #c678dd;
+}
+.syntax--storage.syntax--modifier.syntax--package,
+.syntax--storage.syntax--modifier.syntax--import {
+  color: #abb2bf;
+}
+.syntax--constant {
+  color: #d19a66;
+}
+.syntax--constant.syntax--variable {
+  color: #d19a66;
+}
+.syntax--constant.syntax--character.syntax--escape {
+  color: #56b6c2;
+}
+.syntax--constant.syntax--numeric {
+  color: #d19a66;
+}
+.syntax--constant.syntax--other.syntax--color {
+  color: #56b6c2;
+}
+.syntax--constant.syntax--other.syntax--symbol {
+  color: #56b6c2;
+}
+.syntax--variable {
+  color: #e06c75;
+}
+.syntax--variable.syntax--interpolation {
+  color: #be5046;
+}
+.syntax--variable.syntax--parameter {
+  color: #abb2bf;
+}
+.syntax--string {
+  color: #98c379;
+}
+.syntax--string > .syntax--source,
+.syntax--string .syntax--embedded {
+  color: #abb2bf;
+}
+.syntax--string.syntax--regexp {
+  color: #56b6c2;
+}
+.syntax--string.syntax--regexp .syntax--source.syntax--ruby.syntax--embedded {
+  color: #e5c07b;
+}
+.syntax--string.syntax--other.syntax--link {
+  color: #e06c75;
+}
+.syntax--punctuation.syntax--definition.syntax--comment {
+  color: #5c6370;
+}
+.syntax--punctuation.syntax--definition.syntax--method-parameters,
+.syntax--punctuation.syntax--definition.syntax--function-parameters,
+.syntax--punctuation.syntax--definition.syntax--parameters,
+.syntax--punctuation.syntax--definition.syntax--separator,
+.syntax--punctuation.syntax--definition.syntax--seperator,
+.syntax--punctuation.syntax--definition.syntax--array {
+  color: #abb2bf;
+}
+.syntax--punctuation.syntax--definition.syntax--heading,
+.syntax--punctuation.syntax--definition.syntax--identity {
+  color: #61afef;
+}
+.syntax--punctuation.syntax--definition.syntax--bold {
+  color: #e5c07b;
+  font-weight: bold;
+}
+.syntax--punctuation.syntax--definition.syntax--italic {
+  color: #c678dd;
+  font-style: italic;
+}
+.syntax--punctuation.syntax--section.syntax--embedded {
+  color: #be5046;
+}
+.syntax--punctuation.syntax--section.syntax--method,
+.syntax--punctuation.syntax--section.syntax--class,
+.syntax--punctuation.syntax--section.syntax--inner-class {
+  color: #abb2bf;
+}
+.syntax--support.syntax--class {
+  color: #e5c07b;
+}
+.syntax--support.syntax--type {
+  color: #56b6c2;
+}
+.syntax--support.syntax--function {
+  color: #56b6c2;
+}
+.syntax--support.syntax--function.syntax--any-method {
+  color: #61afef;
+}
+.syntax--entity.syntax--name.syntax--function {
+  color: #61afef;
+}
+.syntax--entity.syntax--name.syntax--class,
+.syntax--entity.syntax--name.syntax--type.syntax--class {
+  color: #e5c07b;
+}
+.syntax--entity.syntax--name.syntax--section {
+  color: #61afef;
+}
+.syntax--entity.syntax--name.syntax--tag {
+  color: #e06c75;
+}
+.syntax--entity.syntax--other.syntax--attribute-name {
+  color: #d19a66;
+}
+.syntax--entity.syntax--other.syntax--attribute-name.syntax--id {
+  color: #61afef;
+}
+.syntax--meta.syntax--class {
+  color: #e5c07b;
+}
+.syntax--meta.syntax--class.syntax--body {
+  color: #abb2bf;
+}
+.syntax--meta.syntax--method-call,
+.syntax--meta.syntax--method {
+  color: #abb2bf;
+}
+.syntax--meta.syntax--definition.syntax--variable {
+  color: #e06c75;
+}
+.syntax--meta.syntax--link {
+  color: #d19a66;
+}
+.syntax--meta.syntax--require {
+  color: #61afef;
+}
+.syntax--meta.syntax--selector {
+  color: #c678dd;
+}
+.syntax--meta.syntax--separator {
+  color: #abb2bf;
+}
+.syntax--meta.syntax--tag {
+  color: #abb2bf;
+}
+.syntax--underline {
+  text-decoration: underline;
+}
+.syntax--none {
+  color: #abb2bf;
+}
+.syntax--invalid.syntax--deprecated {
+  color: #523d14 !important;
+  background-color: #e0c285 !important;
+}
+.syntax--invalid.syntax--illegal {
+  color: white !important;
+  background-color: #e05252 !important;
+}
+.syntax--markup.syntax--bold {
+  color: #d19a66;
+  font-weight: bold;
+}
+.syntax--markup.syntax--changed {
+  color: #c678dd;
+}
+.syntax--markup.syntax--deleted {
+  color: #e06c75;
+}
+.syntax--markup.syntax--italic {
+  color: #c678dd;
+  font-style: italic;
+}
+.syntax--markup.syntax--heading {
+  color: #e06c75;
+}
+.syntax--markup.syntax--heading .syntax--punctuation.syntax--definition.syntax--heading {
+  color: #61afef;
+}
+.syntax--markup.syntax--link {
+  color: #56b6c2;
+}
+.syntax--markup.syntax--inserted {
+  color: #98c379;
+}
+.syntax--markup.syntax--quote {
+  color: #d19a66;
+}
+.syntax--markup.syntax--raw {
+  color: #98c379;
+}
+.syntax--source.syntax--c .syntax--keyword.syntax--operator {
+  color: #c678dd;
+}
+.syntax--source.syntax--cpp .syntax--keyword.syntax--operator {
+  color: #c678dd;
+}
+.syntax--source.syntax--cs .syntax--keyword.syntax--operator {
+  color: #c678dd;
+}
+.syntax--source.syntax--css .syntax--property-name,
+.syntax--source.syntax--css .syntax--property-value {
+  color: #828997;
+}
+.syntax--source.syntax--css .syntax--property-name.syntax--support,
+.syntax--source.syntax--css .syntax--property-value.syntax--support {
+  color: #abb2bf;
+}
+.syntax--source.syntax--elixir .syntax--source.syntax--embedded.syntax--source {
+  color: #abb2bf;
+}
+.syntax--source.syntax--elixir .syntax--constant.syntax--language,
+.syntax--source.syntax--elixir .syntax--constant.syntax--numeric,
+.syntax--source.syntax--elixir .syntax--constant.syntax--definition {
+  color: #61afef;
+}
+.syntax--source.syntax--elixir .syntax--variable.syntax--definition,
+.syntax--source.syntax--elixir .syntax--variable.syntax--anonymous {
+  color: #c678dd;
+}
+.syntax--source.syntax--elixir .syntax--parameter.syntax--variable.syntax--function {
+  color: #d19a66;
+  font-style: italic;
+}
+.syntax--source.syntax--elixir .syntax--quoted {
+  color: #98c379;
+}
+.syntax--source.syntax--elixir .syntax--keyword.syntax--special-method,
+.syntax--source.syntax--elixir .syntax--embedded.syntax--section,
+.syntax--source.syntax--elixir .syntax--embedded.syntax--source.syntax--empty {
+  color: #e06c75;
+}
+.syntax--source.syntax--elixir .syntax--readwrite.syntax--module .syntax--punctuation {
+  color: #e06c75;
+}
+.syntax--source.syntax--elixir .syntax--regexp.syntax--section,
+.syntax--source.syntax--elixir .syntax--regexp.syntax--string {
+  color: #be5046;
+}
+.syntax--source.syntax--elixir .syntax--separator,
+.syntax--source.syntax--elixir .syntax--keyword.syntax--operator {
+  color: #d19a66;
+}
+.syntax--source.syntax--elixir .syntax--variable.syntax--constant {
+  color: #e5c07b;
+}
+.syntax--source.syntax--elixir .syntax--array,
+.syntax--source.syntax--elixir .syntax--scope,
+.syntax--source.syntax--elixir .syntax--section {
+  color: #828997;
+}
+.syntax--source.syntax--gfm .syntax--markup {
+  -webkit-font-smoothing: auto;
+}
+.syntax--source.syntax--gfm .syntax--link .syntax--entity {
+  color: #61afef;
+}
+.syntax--source.syntax--go .syntax--storage.syntax--type.syntax--string {
+  color: #c678dd;
+}
+.syntax--source.syntax--ini .syntax--keyword.syntax--other.syntax--definition.syntax--ini {
+  color: #e06c75;
+}
+.syntax--source.syntax--java .syntax--storage.syntax--modifier.syntax--import {
+  color: #e5c07b;
+}
+.syntax--source.syntax--java .syntax--storage.syntax--type {
+  color: #e5c07b;
+}
+.syntax--source.syntax--java .syntax--keyword.syntax--operator.syntax--instanceof {
+  color: #c678dd;
+}
+.syntax--source.syntax--java-properties .syntax--meta.syntax--key-pair {
+  color: #e06c75;
+}
+.syntax--source.syntax--java-properties .syntax--meta.syntax--key-pair > .syntax--punctuation {
+  color: #abb2bf;
+}
+.syntax--source.syntax--js .syntax--keyword.syntax--operator {
+  color: #56b6c2;
+}
+.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--delete,
+.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--in,
+.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--of,
+.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--instanceof,
+.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--new,
+.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--typeof,
+.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--void {
+  color: #c678dd;
+}
+.syntax--source.syntax--ts .syntax--keyword.syntax--operator {
+  color: #56b6c2;
+}
+.syntax--source.syntax--flow .syntax--keyword.syntax--operator {
+  color: #56b6c2;
+}
+.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--string.syntax--quoted.syntax--json {
+  color: #e06c75;
+}
+.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--string.syntax--quoted.syntax--json > .syntax--punctuation.syntax--string {
+  color: #e06c75;
+}
+.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json,
+.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--array.syntax--json > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json,
+.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json > .syntax--punctuation,
+.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--array.syntax--json > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json > .syntax--punctuation {
+  color: #98c379;
+}
+.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--constant.syntax--language.syntax--json,
+.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--array.syntax--json > .syntax--constant.syntax--language.syntax--json {
+  color: #56b6c2;
+}
+.syntax--ng.syntax--interpolation {
+  color: #e06c75;
+}
+.syntax--ng.syntax--interpolation.syntax--begin,
+.syntax--ng.syntax--interpolation.syntax--end {
+  color: #61afef;
+}
+.syntax--ng.syntax--interpolation .syntax--function {
+  color: #e06c75;
+}
+.syntax--ng.syntax--interpolation .syntax--function.syntax--begin,
+.syntax--ng.syntax--interpolation .syntax--function.syntax--end {
+  color: #61afef;
+}
+.syntax--ng.syntax--interpolation .syntax--bool {
+  color: #d19a66;
+}
+.syntax--ng.syntax--interpolation .syntax--bracket {
+  color: #abb2bf;
+}
+.syntax--ng.syntax--pipe,
+.syntax--ng.syntax--operator {
+  color: #abb2bf;
+}
+.syntax--ng.syntax--tag {
+  color: #56b6c2;
+}
+.syntax--ng.syntax--attribute-with-value .syntax--attribute-name {
+  color: #e5c07b;
+}
+.syntax--ng.syntax--attribute-with-value .syntax--string {
+  color: #c678dd;
+}
+.syntax--ng.syntax--attribute-with-value .syntax--string.syntax--begin,
+.syntax--ng.syntax--attribute-with-value .syntax--string.syntax--end {
+  color: #abb2bf;
+}
+.syntax--source.syntax--ruby .syntax--constant.syntax--other.syntax--symbol > .syntax--punctuation {
+  color: inherit;
+}
+.syntax--source.syntax--php .syntax--class.syntax--bracket {
+  color: #abb2bf;
+}
+.syntax--source.syntax--python .syntax--keyword.syntax--operator.syntax--logical.syntax--python {
+  color: #c678dd;
+}
+.syntax--source.syntax--python .syntax--variable.syntax--parameter {
+  color: #d19a66;
+}
+
+/*
+ * Your Stylesheet
+ *
+ * This stylesheet is loaded when Atom starts up and is reloaded automatically
+ * when it is changed and saved.
+ *
+ * Add your own CSS or Less to fully customize Atom.
+ * If you are unfamiliar with Less, you can read more about it here:
+ * http://lesscss.org
+ */
+/*
+ * Examples
+ * (To see them, uncomment and save)
+ */
+</style>
+
+  </head>
+  <body>
+    <h1 id="image-classification-via-cnn">Image Classification via CNN</h1>
+<p>This tutorial teaches you how to classify images in via convolutional neural network (CNN). You will learn how to create, train and evaluate a CNN by PyTorch.</p>
+<ul>
+<li><a href="#cifar10-dataset">CIFAR10 Dataset</a></li>
+<li><a href="#create-cnn-model">Create CNN Model</a>
+<ul>
+<li><a href="#convolutional-layers">Convolutional layers</a></li>
+<li><a href="#activation">Activation</a></li>
+<li><a href="#pooling-layers-subsampling">Pooling layers (subsampling)</a></li>
+<li><a href="#fully-connected-fc-layers">Fully connected (FC) layers</a></li>
+<li><a href="#create-lenet-5">Create LeNet-5</a></li>
+</ul>
+</li>
+<li><a href="#train-the-model">Train the model</a></li>
+<li><a href="#test-the-model">Test the model</a></li>
+<li><a href="#assignment">Assignment</a></li>
+</ul>
+<p>Acknowledgement: part of this tutorial is adopted from <a href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#sphx-glr-beginner-blitz-cifar10-tutorial-py">Deep Learning with PyTorch: A 60 Minute Blitz</a>.</p>
+<h2 id="cifar10-dataset">CIFAR10 Dataset</h2>
+<p>For this tutorial, we will use the CIFAR10 dataset. The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images. The images in CIFAR-10 are of size 3x32x32, i.e. 3-channel color images of 32x32 pixels in size. Note that PyTorch put channels at first dimension by convention. This is different from other platform such as Pillow, Matlab, skimage, etc. They all put channels at last dimension.</p>
+<center>
+<img src="https://pytorch.org/tutorials/_images/cifar10.png">
+<p>Figure 1. CIFAR10 dataset</p>
+</center>
+<p>We can load CIFAR10 from torchvision. It may take several minutes to download the dataset.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">from</span> torchvision.datasets <span class="syntax--keyword syntax--control">import</span> CIFAR10</span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">from</span> torchvision.transforms <span class="syntax--keyword syntax--control">import</span> ToTensor</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python">trainset <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">CIFAR10</span>(<span class="syntax--variable syntax--parameter syntax--function">root</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--string syntax--quoted">'./data'</span>, <span class="syntax--variable syntax--parameter syntax--function">train</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>,</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">                   </span><span class="syntax--variable syntax--parameter syntax--function">download</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>, <span class="syntax--variable syntax--parameter syntax--function">transform</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--entity syntax--name syntax--function">ToTensor</span>())</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python">testset <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">CIFAR10</span>(<span class="syntax--variable syntax--parameter syntax--function">root</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--string syntax--quoted">'./data'</span>, <span class="syntax--variable syntax--parameter syntax--function">train</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">False</span>,</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">                  </span><span class="syntax--variable syntax--parameter syntax--function">download</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>, <span class="syntax--variable syntax--parameter syntax--function">transform</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--entity syntax--name syntax--function">ToTensor</span>())</span></span></pre>
+<p>The dataset consists of two part. One is train set, another one is test set. Usually, we train our model (CNN) on train set, and test the model on test set.</p>
+<ul>
+<li>Train: Show CNN the images, and tell it which class they belong to. In such a way, we can teach it to distinguish different classes.</li>
+<li>Test: Show CNN the images, and ask it which class they belong to. In such a way, we can test how well the CNN learns.</li>
+</ul>
+<p><code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">trainset.classes</code> contains the all class names in order.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">trainset.<span class="syntax--variable syntax--other syntax--object syntax--property">classes</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']</span></span></span></pre>
+<p>Train set contains 50000 images. Let’s get the first image in train set, and show it.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--support syntax--function">len</span>(trainset)              <span class="syntax--comment syntax--line"># 50000 images</span></span></span>
+<span><span class="syntax--source syntax--python">image, label <span class="syntax--keyword syntax--operator">=</span> trainset[<span class="syntax--constant syntax--numeric">0</span>] <span class="syntax--comment syntax--line"># get first image and its class id</span></span></span>
+<span><span class="syntax--source syntax--python">image.<span class="syntax--variable syntax--other syntax--object syntax--property">shape</span>                <span class="syntax--comment syntax--line"># 3 x 32 x 32</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--entity syntax--name syntax--function">imshow</span>(image)              <span class="syntax--comment syntax--line"># `imshow` is in cifar10.py</span></span></span>
+<span><span class="syntax--source syntax--python">trainset.<span class="syntax--variable syntax--other syntax--object syntax--property">classes</span>[label]    <span class="syntax--comment syntax--line"># 'frog'</span></span></span></pre>
+<p>You can see the image is of shape <span class="math inline-math"><script type="math/tex">3\times32\times32</script></span>, which means it has <span class="math inline-math"><script type="math/tex">3</script></span> channels, and <span class="math inline-math"><script type="math/tex">32\times32</script></span> pixels.</p>
+<p>Script <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">cifar10.py</code> already contains all code you need to load the dataset. In your program, all you need to do is</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">from</span> dataset <span class="syntax--keyword syntax--control">import</span> trainset, testset, imshow</span></span></pre>
+<p>Beside the dataset itself, we also need <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">DataLoader</code> objects to help us randomly load image batch by batch. Batch means a small collection of images. Here, we set <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">batch_size</code> to 4, so each batch contains 4 images.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">trainloader <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">DataLoader</span>(trainset, <span class="syntax--variable syntax--parameter syntax--function">batch_size</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">4</span>, <span class="syntax--variable syntax--parameter syntax--function">shuffle</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>)</span></span>
+<span><span class="syntax--source syntax--python">testloader <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">DataLoader</span>(testset, <span class="syntax--variable syntax--parameter syntax--function">batch_size</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">4</span>, <span class="syntax--variable syntax--parameter syntax--function">shuffle</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>)</span></span></pre>
+<p>Then we may iterate over the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">DataLoader</code>, to get batches until the dataset is exhausted.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">for</span> batch <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> trainloader:</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>images, labels <span class="syntax--keyword syntax--operator">=</span> batch</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(images.<span class="syntax--variable syntax--other syntax--object syntax--property">shape</span>) <span class="syntax--comment syntax--line"># [4, 3, 32, 32]</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(labels.<span class="syntax--variable syntax--other syntax--object syntax--property">shape</span>) <span class="syntax--comment syntax--line"># [4]</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">break</span></span></span></pre>
+<p><code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">images</code> is of shape <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">[4, 3, 32, 32]</code>, which means it contains 4 images, each has 3 channels, and is of size 32x32. <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">labels</code> contains 4 scalars, which are the class IDs of this batch.</p>
+<h2 id="create-cnn-model">Create CNN Model</h2>
+<p>In this tutorial, we implement a simple but famous CNN model, LeNet-5. 5 means it contains 5 (convolutional or fully-connected) layers.</p>
+<center>
+<img src="https://www.researchgate.net/profile/Vladimir_Golovko3/publication/313808170/figure/fig3/AS:552880910618630@1508828489678/Architecture-of-LeNet-5.png">
+<p>Figure 2. Architecture of LeNet-5</p>
+</center>
+<p>A typical CNN consists of these kinds of layer — convolutional layers, max pooling layers, and fully connected layers.</p>
+<h4 id="convolutional-layers">Convolutional layers</h4>
+<p>Convolutional layers are usually the first several layers. They perform a convolution on the output of last layer to extract features from the image. A convolutional layer has three architecture parameters:</p>
+<ul>
+<li>kernel_size <span class="math inline-math"><script type="math/tex">h\times w</script></span>: the size of the convolutional kernel.</li>
+<li>in_channels: the number of input channels</li>
+<li>out_channels: the number of output channels</li>
+</ul>
+<p>The total number of trainable parameters in convolutional kernel is:</p>
+<span class="math display-math"><script type="math/tex; mode=display">h\times w \times \text{in_channels}\times\text{out_channels}
+</script></span>
+<p>The convolution is usually performed without padding, so image size will shrink after convolution. If input image size is <span class="math inline-math"><script type="math/tex">H\times W</script></span> and the kernel size is <span class="math inline-math"><script type="math/tex">h\times w</script></span>, the output will be of size</p>
+<span class="math display-math"><script type="math/tex; mode=display">(H+1-h) \times (W+1-w).
+</script></span>
+<p>Then we take channels and batch size into consideration, assume the input tensor has shape [batch_size, in_channels, H, W], then the output tensor will have shape</p>
+<ul>
+<li>input shape: [batch_size, in_channels, H, W]</li>
+<li>output shape: [batch_size, out_channels, H+1-h, W+1-w]</li>
+</ul>
+<h4 id="activation">Activation</h4>
+<p>The output of convolutional layer and fully connected layer is usually “activated”, i.e., transformed by a non-linear function, such as ReLU, sigmoid, tanh, etc. Activation functions are all scalar function. They do not change the tensor shape, but only map each element into a new value. They usually contain no trainable parameters.</p>
+<p>In this tutorial, we choose perhaps the most popular activation function, <span class="math inline-math"><script type="math/tex">ReLU(x) = \max(0, x)</script></span>.</p>
+<center>
+<img src="https://mk0analyticsindf35n9.kinstacdn.com/wp-content/uploads/2018/01/relu-activation-function-1.png">
+<p>Figure 3. ReLU</p>
+</center>
+Here we demonstrate how to create the first convolutional layer of LeNet-5 by PyTorch. This layer has kernel size 5x5 and its output contains 6 channels. Its input is the original RGB images, so `in_channels=3`. The output is activated by ReLU (Original paper uses tanh).
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> torch.nn <span class="syntax--keyword syntax--control">as</span> nn</span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># convolutional layer 1</span></span></span>
+<span><span class="syntax--source syntax--python">conv_layer1 <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Sequential</span>(</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">Conv2d</span>(<span class="syntax--variable syntax--parameter syntax--function">in_channels</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">3</span>, <span class="syntax--variable syntax--parameter syntax--function">out_channels</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">6</span>, <span class="syntax--variable syntax--parameter syntax--function">kernel_size</span><span class="syntax--keyword syntax--operator">=</span>(<span class="syntax--constant syntax--numeric">5</span>,<span class="syntax--constant syntax--numeric">5</span>)),</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">ReLU</span>(),</span></span>
+<span><span class="syntax--source syntax--python">)</span></span></pre>
+<h4 id="pooling-layers-(subsampling)">Pooling layers (subsampling)</h4>
+<p>Pooling usually follows a convolutional layer. There are two kinds of pooling layer — maximum pooling and average pooling. Maximum pooling computes the maximum of small local patches, while average pooling computes the average of small local patches.</p>
+<center>
+<img src="https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png" style="width:50%">
+<p> Figure 4. Max pooling with kernel size 2x2 </p>
+</center>
+<p>The kernel size of a pooling layer is the size of local patches. Assume the input image is of size <span class="math inline-math"><script type="math/tex">H\times W</script></span> and the kernel size is <span class="math inline-math"><script type="math/tex">h\times w</script></span>, the output of pooling layer will be of size</p>
+<span class="math display-math"><script type="math/tex; mode=display">\frac{H}{h} \times \frac{W}{w}.
+</script></span>
+<p>Then we take channels and batch size into consideration, input tensor and output tensor will have shape:</p>
+<ul>
+<li>input shape: [batch_size, in_channels, H, W],</li>
+<li>output shape: [batch_size, in_channels, H/h, W/w].</li>
+</ul>
+<p>You may notice that pooling layers do not change the number of channels. Pooling layer does not contain any trainable parameters.</p>
+<p>This example demonstrate how to create a 2x2 max pooling layer.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">max_pool <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">MaxPool2d</span>(<span class="syntax--variable syntax--parameter syntax--function">kernel_size</span><span class="syntax--keyword syntax--operator">=</span>(<span class="syntax--constant syntax--numeric">2</span>,<span class="syntax--constant syntax--numeric">2</span>))</span></span></pre>
+<h4 id="fully-connected-(fc)-layers">Fully connected (FC) layers</h4>
+<p>Fully connected (FC) layers are usually the last several layers. They take the features conv layers produced and output the final classification result. Before go into FC layers, we need to “flatten” the intermediate representation produced by convolutional layers. The output of CNN is a 4D tensor of shape [batch_size, channels, H, W]. After flattened, it becomes a 2D tensor of shape [batch_size, channels*H*W].
+This 2D tensor is exactly what FC layers consumes as input.</p>
+<center>
+4D tensor of shape [batch_size, channels, H, W]
+<p>|<br>
+flatten<br>
+|<br>
+v<br>
+2D tensor of shape [batch_size, channels*H*W]</p>
+</center>
+<p>A FC layer has two architecture parameter — input features and output features:</p>
+<ul>
+<li>in_features: the number of input features,</li>
+<li>out_features: the number of output features.</li>
+</ul>
+<center>
+<img src="https://www.researchgate.net/profile/Srikanth_Tammina/publication/337105858/figure/fig3/AS:822947157643267@1573217300519/Types-of-pooling-d-Fully-Connected-Layer-At-the-end-of-a-convolutional-neural-network.jpg" style="width:30%">
+<p> Figure 5. FC layer with 7 input features and 5 output features</p>
+</center>
+<p>The input and output of FC layers are of shape:</p>
+<ul>
+<li>input shape: [batch_size, in_features]</li>
+<li>output shape: [batch_size, out_features]</li>
+</ul>
+<p>Because there is a weight between any input feature and any output feature, so the number of trainable parameters in a FC layer is</p>
+<span class="math display-math"><script type="math/tex; mode=display">\text{in_features} \times \text{out_features}.
+</script></span>
+<p>This example shows how to create a FC layer in PyTorch. The created FC layer has 120 input features and 84 output features, and its output is activated by ReLU.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">fc_layer <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Sequential</span>(</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">Linear</span>(<span class="syntax--variable syntax--parameter syntax--function">in_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">120</span>, <span class="syntax--variable syntax--parameter syntax--function">out_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">84</span>),</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">ReLU</span>(),</span></span>
+<span><span class="syntax--source syntax--python">)</span></span></pre>
+<p>The last layer of our CNN is a little bit special. First, it is not activated, i.e., no ReLU. Second, its output features must be equal to the number of classes. Here, we have 10 classes in total, so its output features must be 10.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">output_layer <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Linear</span>(<span class="syntax--variable syntax--parameter syntax--function">in_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">84</span>, <span class="syntax--variable syntax--parameter syntax--function">out_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">10</span>)</span></span></pre>
+<h4 id="create-lenet-5">Create LeNet-5</h4>
+<p>LeNet-5 is a simple but famous CNN model. It contains 5 (convolutional or fully-connected) layers. Here, we choose it as our CNN model. Its architecture is shown in figure 6.</p>
+<center>
+<img src="https://www.researchgate.net/profile/Vladimir_Golovko3/publication/313808170/figure/fig3/AS:552880910618630@1508828489678/Architecture-of-LeNet-5.png">
+<p>Figure 6. Architecture of LeNet-5</p>
+</center>
+<p>The layers of LeNet-5 are summarized here:</p>
+<ol start="0">
+<li>Input image: 3x32x32</li>
+<li>Conv layer:
+<ul>
+<li>kernel_size: 5x5</li>
+<li>in_channels: 3</li>
+<li>out_channels: 6</li>
+<li>activation: ReLU</li>
+</ul>
+</li>
+<li>Max pooling:
+<ul>
+<li>kernel_size: 2x2</li>
+</ul>
+</li>
+<li>Conv layer:
+<ul>
+<li>kernel_size: 5x5</li>
+<li>in_channels: 6</li>
+<li>out_channels: 16</li>
+<li>activation: ReLU</li>
+</ul>
+</li>
+<li>Max pooling:
+<ul>
+<li>kernel_size: 2x2</li>
+</ul>
+</li>
+<li>FC layer:
+<ul>
+<li>in_features: 16*5*5</li>
+<li>out_features: 120</li>
+<li>activation: ReLU</li>
+</ul>
+</li>
+<li>FC layer:
+<ul>
+<li>in_features: 120</li>
+<li>out_features: 84</li>
+<li>activation: ReLU</li>
+</ul>
+</li>
+<li>FC layer:
+<ul>
+<li>in_features: 84</li>
+<li>out_features: 10 (number of classes)</li>
+</ul>
+</li>
+</ol>
+<p><code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">model.py</code> create LeNet-5 by PyTorch. First, we create the 2 convolutional layers:</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> torch.nn <span class="syntax--keyword syntax--control">as</span> nn</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># convolutional layer 1</span></span></span>
+<span><span class="syntax--source syntax--python">conv_layer1 <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Sequential</span>(</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">Conv2d</span>(<span class="syntax--variable syntax--parameter syntax--function">in_channels</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">3</span>, <span class="syntax--variable syntax--parameter syntax--function">out_channels</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">6</span>, <span class="syntax--variable syntax--parameter syntax--function">kernel_size</span><span class="syntax--keyword syntax--operator">=</span>(<span class="syntax--constant syntax--numeric">5</span>,<span class="syntax--constant syntax--numeric">5</span>)),</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">ReLU</span>()),</span></span>
+<span><span class="syntax--source syntax--python">)</span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># convolutional layer 2</span></span></span>
+<span><span class="syntax--source syntax--python">conv_layer2 <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Sequential</span>(</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">Conv2d</span>(<span class="syntax--variable syntax--parameter syntax--function">in_channels</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">6</span>, <span class="syntax--variable syntax--parameter syntax--function">out_channels</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">16</span>, <span class="syntax--variable syntax--parameter syntax--function">kernel_size</span><span class="syntax--keyword syntax--operator">=</span>(<span class="syntax--constant syntax--numeric">5</span>,<span class="syntax--constant syntax--numeric">5</span>)),</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">ReLU</span>()),</span></span>
+<span><span class="syntax--source syntax--python">)</span></span></pre>
+<p>Then, the 3 fully connected layers:</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># fully connected layer 1</span></span></span>
+<span><span class="syntax--source syntax--python">fc_layer1 <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Sequential</span>(</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">Linear</span>(<span class="syntax--variable syntax--parameter syntax--function">in_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">16</span><span class="syntax--keyword syntax--operator">*</span><span class="syntax--constant syntax--numeric">5</span><span class="syntax--keyword syntax--operator">*</span><span class="syntax--constant syntax--numeric">5</span>, <span class="syntax--variable syntax--parameter syntax--function">out_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">120</span>),</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">ReLU</span>(),</span></span>
+<span><span class="syntax--source syntax--python">)</span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># fully connected layer 2</span></span></span>
+<span><span class="syntax--source syntax--python">fc_layer2 <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Sequential</span>(</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">Linear</span>(<span class="syntax--variable syntax--parameter syntax--function">in_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">120</span>, <span class="syntax--variable syntax--parameter syntax--function">out_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">84</span>),</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">ReLU</span>(),</span></span>
+<span><span class="syntax--source syntax--python">)</span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># fully connected layer 3</span></span></span>
+<span><span class="syntax--source syntax--python">fc_layer3 <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Linear</span>(<span class="syntax--variable syntax--parameter syntax--function">in_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">84</span>, <span class="syntax--variable syntax--parameter syntax--function">out_features</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">10</span>)</span></span></pre>
+<p>Finally, combine them as LeNet-5. Don’t forget flatten layer before FC layers.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">LeNet5 <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">Sequential</span>(</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>conv_layer1,</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">MaxPool2d</span>(<span class="syntax--variable syntax--parameter syntax--function">kernel_size</span><span class="syntax--keyword syntax--operator">=</span>(<span class="syntax--constant syntax--numeric">2</span>,<span class="syntax--constant syntax--numeric">2</span>)),</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>conv_layer2,</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">MaxPool2d</span>(<span class="syntax--variable syntax--parameter syntax--function">kernel_size</span><span class="syntax--keyword syntax--operator">=</span>(<span class="syntax--constant syntax--numeric">2</span>,<span class="syntax--constant syntax--numeric">2</span>)),</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>nn.<span class="syntax--entity syntax--name syntax--function">Flatten</span>(), <span class="syntax--comment syntax--line"># flatten</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>fc_layer1,</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>fc_layer2,</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>fc_layer3</span></span>
+<span><span class="syntax--source syntax--python">)</span></span></pre>
+<h2 id="train-the-model">Train the model</h2>
+<p>After create the network, we will teach it how to distinguish images between different classes. Intuitively, the teaching is achieved by showing it the images in train set, and telling it which classes they belong to. The network will gradually learn the concepts, such as ‘bird’, ‘cat’, ‘dog’, etc., just like how human children learn. This part of code is in <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">train.py</code>.</p>
+<p>First, we import our model <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">LeNet5</code>, and define the loss function and optimization method. Here, we use cross-entropy loss, which is designed for classification tasks. This loss measure how similar your prediction is to the correct answer (ground truth). The closer your prediction is to the correct one, the smaller this loss is. To minimize this loss, we need an optimizer. Here, we use stochastic gradient descent (SGD) method as optimizer.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">from</span> model <span class="syntax--keyword syntax--control">import</span> LeNet5</span></span>
+<span><span class="syntax--source syntax--python">model <span class="syntax--keyword syntax--operator">=</span> LeNet5</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python">loss_fn <span class="syntax--keyword syntax--operator">=</span> nn.<span class="syntax--entity syntax--name syntax--function">CrossEntropyLoss</span>()</span></span>
+<span><span class="syntax--source syntax--python">optimizer <span class="syntax--keyword syntax--operator">=</span> optim.<span class="syntax--entity syntax--name syntax--function">SGD</span>(model.<span class="syntax--entity syntax--name syntax--function">parameters</span>(), <span class="syntax--variable syntax--parameter syntax--function">lr</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">0.001</span>, <span class="syntax--variable syntax--parameter syntax--function">momentum</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">0.9</span>)</span></span></pre>
+<p>When training a network, the most important parameter is learning rate. In above example, learning rate <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">lr</code> is 0.001. To train model successfully, you need a proper learning rate. If learning rate is too small, your loss will converge very slowly. If learning rate is too big, loss may not converge at all.</p>
+<p>Then we start training. The training usually takes minutes to hours. Once you finish looping over the dataset one time, you finished one epoch. A successful train usually has multiple epochs. Following example trains the network for 2 epochs.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># training</span></span></span>
+<span><span class="syntax--source syntax--python">num_epoch <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--constant syntax--numeric">2</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">for</span> epoch <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> <span class="syntax--support syntax--function">range</span>(num_epoch):<span class="trailing-whitespace">  </span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>running_loss <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--constant syntax--numeric">0.0</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">for</span> i, data <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> <span class="syntax--support syntax--function">enumerate</span>(trainloader, <span class="syntax--constant syntax--numeric">0</span>):</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--comment syntax--line"># get the images; data is a list of [images, labels]</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>images, labels <span class="syntax--keyword syntax--operator">=</span> data</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>optimizer.<span class="syntax--entity syntax--name syntax--function">zero_grad</span>() <span class="syntax--comment syntax--line"># zero the parameter gradients</span></span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--comment syntax--line"># get prediction</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>outputs <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">model</span>(images)</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--comment syntax--line"># compute loss</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>loss <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">loss_fn</span>(outputs, labels)</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--comment syntax--line"># reduce loss</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>loss.<span class="syntax--entity syntax--name syntax--function">backward</span>()</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>optimizer.<span class="syntax--entity syntax--name syntax--function">step</span>()</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--comment syntax--line"># print statistics</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>running_loss <span class="syntax--keyword syntax--operator">+=</span> loss.<span class="syntax--entity syntax--name syntax--function">item</span>()</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--keyword syntax--control">if</span> i <span class="syntax--keyword syntax--operator">%</span> <span class="syntax--constant syntax--numeric">500</span> <span class="syntax--keyword syntax--operator">==</span> <span class="syntax--constant syntax--numeric">499</span>:  <span class="syntax--comment syntax--line"># print every 500 mini-batches</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'[%d, %5d] loss: %.3f'</span> <span class="syntax--keyword syntax--operator">%</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">                  </span>(epoch <span class="syntax--keyword syntax--operator">+</span> <span class="syntax--constant syntax--numeric">1</span>, i <span class="syntax--keyword syntax--operator">+</span> <span class="syntax--constant syntax--numeric">1</span>, running_loss <span class="syntax--keyword syntax--operator">/</span> <span class="syntax--constant syntax--numeric">500</span>))</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>running_loss <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--constant syntax--numeric">0.0</span></span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'Finished Training'</span>)</span></span></pre>
+<h2 id="test-the-model">Test the model</h2>
+<p>After training, our model can classify images now. At first, we show it several images in test set to see if it can correctly recognize them.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">dataiter <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--support syntax--function">iter</span>(testloader)</span></span>
+<span><span class="syntax--source syntax--python">images, labels <span class="syntax--keyword syntax--operator">=</span> dataiter.<span class="syntax--entity syntax--name syntax--function">next</span>()</span></span>
+<span><span class="syntax--source syntax--python">predictions <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">model</span>(images).<span class="syntax--entity syntax--name syntax--function">argmax</span>(<span class="syntax--constant syntax--numeric">1</span>)</span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># show some prediction result</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'GroundTruth: '</span>, <span class="syntax--string syntax--quoted">' '</span>.<span class="syntax--entity syntax--name syntax--function">join</span>(<span class="syntax--string syntax--quoted">'%5s'</span> <span class="syntax--keyword syntax--operator">%</span> classes[labels[j]] <span class="syntax--keyword syntax--control">for</span> j <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> <span class="syntax--support syntax--function">range</span>(<span class="syntax--constant syntax--numeric">4</span>)))</span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'Prediction: '</span>, <span class="syntax--string syntax--quoted">' '</span>.<span class="syntax--entity syntax--name syntax--function">join</span>(<span class="syntax--string syntax--quoted">'%5s'</span> <span class="syntax--keyword syntax--operator">%</span> classes[predictions[j]] <span class="syntax--keyword syntax--control">for</span> j <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> <span class="syntax--support syntax--function">range</span>(<span class="syntax--constant syntax--numeric">4</span>)))</span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># imshow(torchvision.utils.make_grid(images))</span></span></span></pre>
+<p>You will see images and output like this. Due to randomness, your results may be different.</p>
+<center>
+<img src="samples.png">
+</center>
+<pre class="editor-colors lang-text"><span><span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text">GroundTruth:    cat  ship  ship plane</span></span></span>
+<span><span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text">Prediction:    cat  ship plane plane</span></span></span></pre>
+<p>Next, let us look at how the model performs on the whole dataset.</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">accuracy</span>(<span class="syntax--variable syntax--parameter syntax--function">model</span>, <span class="syntax--variable syntax--parameter syntax--function">data_loader</span>):</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>correct, total <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--constant syntax--numeric">0</span>, <span class="syntax--constant syntax--numeric">0</span></span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">with</span> torch.<span class="syntax--entity syntax--name syntax--function">no_grad</span>():</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--keyword syntax--control">for</span> batch <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> data_loader:</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>images, labels <span class="syntax--keyword syntax--operator">=</span> batch</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>images, labels <span class="syntax--keyword syntax--operator">=</span> images.<span class="syntax--entity syntax--name syntax--function">to</span>(device), labels.<span class="syntax--entity syntax--name syntax--function">to</span>(device)</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>outputs <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">model</span>(images)</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>_, predicted <span class="syntax--keyword syntax--operator">=</span> torch.<span class="syntax--entity syntax--name syntax--function">max</span>(outputs.<span class="syntax--variable syntax--other syntax--object syntax--property">data</span>, <span class="syntax--constant syntax--numeric">1</span>)</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>total <span class="syntax--keyword syntax--operator">+=</span> labels.<span class="syntax--entity syntax--name syntax--function">size</span>(<span class="syntax--constant syntax--numeric">0</span>)</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>correct <span class="syntax--keyword syntax--operator">+=</span> (predicted <span class="syntax--keyword syntax--operator">==</span> labels).<span class="syntax--entity syntax--name syntax--function">sum</span>().<span class="syntax--entity syntax--name syntax--function">item</span>()</span></span>
+<span><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">return</span> correct <span class="syntax--keyword syntax--operator">/</span> total</span></span>
+<span></span> 
+<span></span> 
+<span><span class="syntax--source syntax--python">train_acc <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">accuracy</span>(model, trainloader) <span class="syntax--comment syntax--line"># accuracy on train set</span></span></span>
+<span><span class="syntax--source syntax--python">test_acc <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">accuracy</span>(model, testloader)  <span class="syntax--comment syntax--line"># accuracy on test set</span></span></span>
+<span></span> 
+<span><span class="syntax--source syntax--python"><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'Accuracy on the train set: %f %%'</span> <span class="syntax--keyword syntax--operator">%</span> (<span class="syntax--constant syntax--numeric">100</span> <span class="syntax--keyword syntax--operator">*</span> train_acc))</span></span>
+<span><span class="syntax--source syntax--python"><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'Accuracy on the test set: %f %%'</span> <span class="syntax--keyword syntax--operator">%</span> (<span class="syntax--constant syntax--numeric">100</span> <span class="syntax--keyword syntax--operator">*</span> test_acc))</span></span></pre>
+<p>The output looks like</p>
+<pre class="editor-colors lang-text"><span><span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text">Accuracy on the train set: 62.34 %</span></span></span>
+<span><span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text">Accuracy on the test set: 57.23 %</span></span></span></pre>
+<p>Since we trained for only 2 epochs, the accuracy is not very high.</p>
+<p>Finally, we can save our model to a file:</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">torch.<span class="syntax--entity syntax--name syntax--function">save</span>(LeNet5.<span class="syntax--entity syntax--name syntax--function">state_dict</span>(), <span class="syntax--string syntax--quoted">'model.pth'</span>)</span></span></pre>
+<h1 id="assignment">Assignment</h1>
+<p>Modify <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">train.py</code>, <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">dataset.py</code> and <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">model.py</code> to train a CNN to recognize hand-written digits in MNIST datasets.</p>
+<center>
+<img src="https://www.researchgate.net/profile/Steven_Young11/publication/306056875/figure/fig1/AS:393921575309346@1470929630835/Example-images-from-the-MNIST-dataset.png" style="width:50%">
+<p>Figure 7. Example images from MNIST</p>
+</center>
+<p>MNIST contains images of digits 0-9 written by human. The task is to recognize which digit the image represent. All image are grey scale (only 1 channel), and contains 28x28 pixels.</p>
+<p>Your CNN should contain following layers in order.</p>
+<ol start="0">
+<li>Input image: 1x28x28</li>
+<li>Conv layer:
+<ul>
+<li>kernel_size: 5x5</li>
+<li>out_channels: 16</li>
+<li>activation: ReLU</li>
+</ul>
+</li>
+<li>Max pooling:
+<ul>
+<li>kernel_size: 2x2</li>
+</ul>
+</li>
+<li>Conv layer:
+<ul>
+<li>kernel_size: 3x3</li>
+<li>out_channels: 32</li>
+<li>activation: ReLU</li>
+</ul>
+</li>
+<li>Max pooling:
+<ul>
+<li>kernel_size: 2x2</li>
+</ul>
+</li>
+<li>Conv layer:
+<ul>
+<li>kernel_size: 1x1</li>
+<li>out_channels: 8</li>
+<li>activation: ReLU</li>
+</ul>
+</li>
+<li>FC layer:
+<ul>
+<li>out_features: 64</li>
+<li>activation: ReLU</li>
+</ul>
+</li>
+<li>FC layer:
+<ul>
+<li>out_features: ?? (to be inferred by you)</li>
+<li>activation: None</li>
+</ul>
+</li>
+</ol>
+<p>Tasks:</p>
+<ol>
+<li>Answer following questions first (7 points):
+<ul>
+<li>Assume we set <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">batch_size=8</code>, what shape do above 7 layers’ inputs and outputs have?</li>
+<li>How many trainable parameters each layer contains?</li>
+</ul>
+</li>
+<li>Train a CNN to recognize hand-written digits in MNIST datasets.
+<ul>
+<li>Modify <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">model.py</code> to create a CNN with architecture specified above. (7 points)</li>
+<li>Modify <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">train.py</code> and <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">dataset.py</code> to train it on MNIST dataset. Your model should achieve an accuracy higher than 90% on test set. Usually, 5-10 epochs are enough to achieve this accuracy. Save your model to file <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">model.pth</code>. (6 points)</li>
+</ul>
+</li>
+</ol>
+<p>Your submission should include:</p>
+<ol>
+<li>An report, containing
+<ul>
+<li>your answer to above questions</li>
+<li>screenshot and explanation of your program output.</li>
+</ul>
+</li>
+<li>All python source file.</li>
+<li><code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">model.pth</code>, the saved model.</li>
+</ol>
+<p>Please submit before <strong>23:59 on December 20th (Sunday)</strong>. You may submit as many times as you want, but only your latest submission will be graded.</p>
+
+  </body>
+</html>
